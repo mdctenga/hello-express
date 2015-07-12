@@ -4,4 +4,13 @@ html
     script(src="js/script.js" type="text/javascript")
     link(href="css/style.css" rel="stylesheet")
   body
-    h1= message
+    if user
+      div.welcomebox
+        h1 Welcome, #{user}!
+
+    else
+      div.loginbox
+        h1 Please Sign-in!
+          form(name="login", action="/sign-in", method="post")
+            input(type="text", name="userName")
+            button Submit
