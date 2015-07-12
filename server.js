@@ -8,6 +8,24 @@ var path = require('path');
 
 var session = require('express-session');
 var RedisStore = require('connect-redis')(session);
+var passport = require('passport');
+var LocalStrategy = require ('passport-local').Strategy;
+
+passport.use(new LocalStrategy(
+  function(username, password, done) {
+    var admin = config.admin;
+    if (!admin){
+      return done(new Error('No admin configured!'));
+    }
+    if (username !== admin.username) {
+      return done(null, false, { message: 'Incorrect username.' });
+    }
+    if (password !== admin.password) {
+      return done(null, false, { message: 'Incorrect username.' });
+    }
+    return done(null, admin);
+  })
+);
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -25,6 +43,9 @@ app.use(session({
     maxAge: 10 * 1000// 10 seconds
   }
 }));
+
+app.use(passport.initialize());
+// app.use(passport.session());
 
 app.use(function (req, res, next) {
   var session = req.session;
@@ -54,6 +75,16 @@ app.post('/sign-in', function (req, res) {
   }
 
   res.redirect('/');
+});
+
+app.post('/login',
+  passport.authenticate('local', {successRedirect: '/secret',
+                                  failureRedirect: '/',
+                                  session: false})
+);
+
+app.get('/secret', function(req, res, next) {
+  res.send('SECRET!');
 });
 
 var server = app.listen (config.port, function () {

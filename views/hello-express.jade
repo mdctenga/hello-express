@@ -3,11 +3,10 @@ html
     title= title
     script(src="js/script.js" type="text/javascript")
     link(href="css/style.css" rel="stylesheet")
-  body
+  body.bkimg
     if user
       div.welcomebox
         h1 Welcome, #{user}!
-
     else
       div.loginbox
         h1 Please Sign-in!
